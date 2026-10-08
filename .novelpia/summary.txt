@@ -1,60 +1,12 @@
-novel_page.html 200 189257
-api_novel.json 200 2400
-api_eplist.json 200 26631
-episodes found: 50
-1 833813 1 Prologue
-2 833814 2 #2 I'll Protect The Malfoy Family!
-3 833815 3 #3 The Hogwarts Express
-4 833817 4 #4 The Boggart In The Closet
-5 833818 5 #5 Buckbeak The Hippogriff
-6 833819 6 #6 Malfoy's Right Hand
-7 833821 7 #7 Hogsmeade
-8 833822 8 #8 Quidditch Practice And Letters
-9 833823 9 #9 Quidditch Match, Gryffindor Vs Slytherin
-10 833826 10 #10 Werewolf Lecture And The Fidelius Charm
-11 833837 11 #11 Again, Hogsmeade
-12 833838 12 #12 The Shrieking Shack
-13 833840 13 #13 Side Story. Age 10, Diagon Alley
-14 833842 14 #14 After That Day
-15 833843 15 #15 Quidditch Match, Hufflepuff Vs Slytherin
-16 833844 16 #16 The Mouse, The Mousetrap, And The Owner
-17 833845 17 #17 Shut Your Mouth, Malfoy.
-18 833847 18 #18 Side Story. Age 10, Flying Lessons
-19 833848 19 #19 Buckbeak The Hippogriff (2)
-20 833849 20 #20 Three Hours Ago, Shut Up, Malfoy
-21 833860 21 Two Hours Ago, Buckbeak The Hippogriff (2)
-22 833863 22 From An Hour Ago, Until Now
-23 833864 23 Quidditch Match, Gryffindor Vs Hufflepuff
-24 833865 24 Side Story. Age 10, Brats And Punks
-25 833866 25 Side Story. Age 10, Lightning-Shaped Scar
-26 833867 26 Side Story. Age 10, That Word That Must Never Be Spoken
-27 833868 27 Quidditch World Cup
-28 833869 28 The Triwizard Tournament
-29 833870 29 The Society for the Promotion of Elfish Welfare
-30 833871 30 The Unforgivable Curses
-31 833872 31 Blast-Ended Skrewt
-32 833873 32 Jealousy
-33 833874 33 The Hungarian Horntail
-34 833875 34 Christmas Ball Preparations
-35 833876 35 Christmas Ball
-36 833877 36 During The Christmas Ball
-37 833878 37 The Golden Egg
-38 833879 38 Second Round
-39 833880 39 Alastor Moody
-40 833881 40 Mad-Eye Moody
-41 833882 41 Moody's Trunk
-42 833883 42 Truth
-43 833884 43 Hufflepuff's Cup
-44 833885 44 Metamorphmagus
-45 833886 45 Ginny Weasley
-46 833887 46 Farewell
-47 833888 47 Gringotts
-48 833889 48 Triwizard Tournament, Third Round
-49 833890 49 Barty Crouch
-50 833891 50 Voldemort
-ep_833843_viewer.html 200 173682
-ep_833843_api.json 200 3102
-ep_833843_api2.json 400 318
-ep_833844_viewer.html 200 159397
-ep_833844_api.json 401 841
-ep_833844_api2.json 400 318
+v_833843.html 200 173658
+833843 jwt: True
+c_833843.json 400 530
+833843 content keys: ['name', 'message', 'code', 'path']
+v_833844.html 200 159397
+833844 jwt: False
+v_833842.html 200 173558
+833842 jwt: True
+c_833842.json 400 530
+833842 content keys: ['name', 'message', 'code', 'path']
+v_833845.html 200 159319
+833845 jwt: False
