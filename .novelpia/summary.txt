@@ -1,12 +1,1 @@
-v_833843.html 200 173658
-833843 jwt: True
-c_833843.json 400 530
-833843 content keys: ['name', 'message', 'code', 'path']
-v_833844.html 200 159397
-833844 jwt: False
-v_833842.html 200 173558
-833842 jwt: True
-c_833842.json 400 530
-833842 content keys: ['name', 'message', 'code', 'path']
-v_833845.html 200 159319
-833845 jwt: False
+files scanned 160 snips 152
