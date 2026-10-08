@@ -1,0 +1,15 @@
+name: novelpia-fetch
+on:
+  push:
+    branches: [novelpia-fetch]
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .novelpia/probe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: out
+          path: out
+          retention-days: 1
