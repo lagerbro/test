@@ -3,25 +3,19 @@ const fs = require('fs');
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1280, height: 2000 } });
-  let url = 'https://global.novelpia.com/viewer/833813';
   let out = '';
-  for (let i = 0; i < 4; i++) {
-    await p.goto(url, { waitUntil: 'networkidle', timeout: 60000 }).catch(e => out += 'GOTO ERR ' + e.message + '\n');
-    await p.waitForTimeout(6000);
-    for (let s = 0; s < 15; s++) { await p.mouse.wheel(0, 3000); await p.waitForTimeout(400); }
-    const t = await p.innerText('body').catch(() => '');
-    out += `\n\n===== ${url} =====\n` + t;
-    const links = await p.$$eval('a', as => as.map(a => [a.innerText.trim(), a.href]));
-    const ids = [...new Set(links.map(l => l[1]).filter(h => /\/viewer\/\d+/.test(h)))];
-    out += '\n[viewer links] ' + ids.join(' ');
-    const m = url.match(/viewer\/(\d+)/)[1];
-    const next = ids.find(h => +h.match(/viewer\/(\d+)/)[1] > +m);
-    if (!next) {
-      const btn = p.getByText('Next Chapter', { exact: false }).first();
-      try { await btn.click({ timeout: 5000 }); await p.waitForTimeout(4000); if (p.url() !== url) { url = p.url(); continue; } } catch (e) {}
-      break;
-    }
-    url = next;
+  p.on('response', async r => { if (/episode/.test(r.url()) && /api/.test(r.url())) out += '\n[api] ' + r.url(); });
+  await p.goto('https://global.novelpia.com/viewer/833813', { waitUntil: 'networkidle', timeout: 60000 });
+  for (let i = 0; i < 3; i++) {
+    await p.waitForTimeout(5000);
+    try { await p.getByText('Not now').first().click({ timeout: 3000 }); } catch (e) {}
+    const before = p.url();
+    try { await p.getByText('Next Chapter', { exact: true }).last().click({ timeout: 8000, force: true }); } catch (e) { out += '\nNEXT ERR ' + e.message.split('\n')[0]; }
+    await p.waitForTimeout(7000);
+    try { await p.waitForLoadState('networkidle', { timeout: 20000 }); } catch (e) {}
+    for (let s = 0; s < 15; s++) { await p.mouse.wheel(0, 3000); await p.waitForTimeout(300); }
+    out += `\n\n===== ${before} -> ${p.url()} =====\n` + (await p.innerText('body').catch(() => ''));
+    if (p.url() === before) break;
   }
   fs.writeFileSync('np/out.txt', out);
   await b.close();
