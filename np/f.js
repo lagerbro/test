@@ -3,20 +3,23 @@ const fs = require('fs');
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1280, height: 2000 } });
-  let out = '';
-  p.on('response', async r => { if (/episode/.test(r.url()) && /api/.test(r.url())) out += '\n[api] ' + r.url(); });
-  await p.goto('https://global.novelpia.com/viewer/833813', { waitUntil: 'networkidle', timeout: 60000 });
-  for (let i = 0; i < 3; i++) {
-    await p.waitForTimeout(5000);
-    try { await p.getByText('Not now').first().click({ timeout: 3000 }); } catch (e) {}
+  fs.writeFileSync('np/out.txt', '');
+  await p.goto('https://global.novelpia.com/viewer/833813', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  for (let i = 0; i < 125; i++) {
+    let t = '';
+    for (let w = 0; w < 20; w++) {
+      await p.waitForTimeout(1000);
+      t = await p.innerText('body').catch(() => '');
+      if (/Next Chapter|Author's Note/.test(t) && t.split(/\s+/).length > 300) break;
+    }
+    const cut = t.search(/\n\d+ Comments\n/);
+    if (cut > 0) t = t.slice(0, cut);
+    fs.appendFileSync('np/out.txt', `\n\n===== ${p.url()} =====\n` + t);
+    try { await p.getByText('Not now').first().click({ timeout: 1500 }); } catch (e) {}
     const before = p.url();
-    try { await p.getByText('Next Chapter', { exact: true }).last().click({ timeout: 8000, force: true }); } catch (e) { out += '\nNEXT ERR ' + e.message.split('\n')[0]; }
-    await p.waitForTimeout(7000);
-    try { await p.waitForLoadState('networkidle', { timeout: 20000 }); } catch (e) {}
-    for (let s = 0; s < 15; s++) { await p.mouse.wheel(0, 3000); await p.waitForTimeout(300); }
-    out += `\n\n===== ${before} -> ${p.url()} =====\n` + (await p.innerText('body').catch(() => ''));
-    if (p.url() === before) break;
+    try { await p.getByText('Next Chapter', { exact: true }).last().click({ timeout: 8000, force: true }); } catch (e) { fs.appendFileSync('np/out.txt', '\nNEXT ERR'); break; }
+    for (let w = 0; w < 15 && p.url() === before; w++) await p.waitForTimeout(1000);
+    if (p.url() === before) { fs.appendFileSync('np/out.txt', '\nNO NAV'); break; }
   }
-  fs.writeFileSync('np/out.txt', out);
   await b.close();
 })();
