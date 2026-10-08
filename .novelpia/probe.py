@@ -1,23 +1,26 @@
-import os, re, urllib.request
+import json, os, re, urllib.request, urllib.parse, http.cookiejar
 OUT = "out"; os.makedirs(OUT, exist_ok=True)
-H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
-def fetch(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=H), timeout=30).read().decode("utf-8", "replace")
-h = fetch("https://global.novelpia.com/viewer/833843")
-js = sorted(set(re.findall(r'/_nuxt/[A-Za-z0-9_.-]+\.js', h)))
-seen, queue, snips = set(), list(js), []
-while queue and len(seen) < 300:
-    p = queue.pop()
-    if p in seen: continue
-    seen.add(p)
-    try: s = fetch("https://global.novelpia.com" + p)
-    except Exception as e: continue
-    for q in re.findall(r'["\'/(]([A-Za-z0-9_.-]+\.js)["\']', s):
-        if ("/_nuxt/" + q) not in seen and len(q) < 40: queue.append("/_nuxt/" + q)
-    for kw in ("episode/content", "pv-gn", "signed_key", "CloudFront", "_t"):
-        for m in re.finditer(re.escape(kw), s):
-            if kw == "_t" and not re.match(r'_t\b', s[m.start():m.start()+3]): continue
-            snips.append(f"### {p} [{kw}]\n{s[max(0,m.start()-600):m.start()+900]}\n")
-            if kw == "_t" and len(snips) > 80: break
-print("files scanned", len(seen), "snips", len(snips))
-open(f"{OUT}/snips.txt", "w").write("\n".join(snips))
+H = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36"),
+     ("Origin", "https://global.novelpia.com"), ("Referer", "https://global.novelpia.com/")]
+api = "https://api-global.novelpia.com"
+for no in (833843, 833844):
+    cj = http.cookiejar.CookieJar()
+    op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj)); op.addheaders = H
+    def get(url):
+        try:
+            r = op.open(url, timeout=30); return r.status, r.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as e: return e.code, e.read().decode("utf-8", "replace")
+    c, h = get(f"https://global.novelpia.com/viewer/{no}")
+    print(no, "viewer", c, "cookies:", [k.name for k in cj])
+    m = re.search(r'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+', h)
+    t = m.group(0) if m else ""
+    if not t:
+        c, b = get(f"{api}/v1/novel/episode?episode_no={no}")
+        print(no, "episode api", c)
+        try: t = json.loads(b)["result"].get("_t") or ""
+        except Exception: pass
+    print(no, "token:", bool(t))
+    if not t: continue
+    c, b = get(f"{api}/v1/novel/episode/content?_t={urllib.parse.quote(t)}")
+    print(no, "content", c, b[:200] if c != 200 else "")
+    open(f"{OUT}/c_{no}.json", "w").write(b)
