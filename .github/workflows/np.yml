@@ -1,0 +1,21 @@
+name: np
+on:
+  push:
+    branches: [np-fetch]
+    paths: [np/f.js, .github/workflows/np.yml]
+permissions:
+  contents: write
+jobs:
+  f:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node np/f.js
+      - run: |
+          openssl cms -encrypt -binary -aes256 -in np/out.txt -outform DER -out np/out.enc np/c.pem
+          rm np/out.txt
+          git config user.name bot && git config user.email bot@users.noreply.github.com
+          git add np/out.enc && git commit -m "out" && git push
